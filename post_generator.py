@@ -44,6 +44,24 @@ def generate_post(length,language,tag):
     response = llm.invoke(prompt)
     return response.content
 
+def generate_multiple_posts(length,language,tag,num_variations=3):
+    """
+    Generate multiple variations of the same post
+    """
+    variations = []
+    base_prompt = get_prompt(length,language,tag)
+    
+    for i in range(num_variations):
+        # Add variation instruction to make each post different
+        variation_prompt = base_prompt + f"\n\n5) This is variation {i+1} of {num_variations}. Make this post unique and different from other variations while keeping the same topic and length."
+        response = llm.invoke(variation_prompt)
+        variations.append({
+            "variation": i+1,
+            "content": response.content
+        })
+    
+    return variations
+
 
 if __name__ == "__main__":
     post =  generate_post("Short","English","Job Search")
