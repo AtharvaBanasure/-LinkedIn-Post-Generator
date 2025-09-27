@@ -40,7 +40,6 @@ def main():
                 with st.expander(f"Variation {variation['variation']}", expanded=(i==0)):
                     st.write(variation['content'])
                     
-                    # Display hashtags if included
                     if include_hashtags and variation['hashtags']:
                         st.write("**Suggested Hashtags:**")
                         hashtag_text = " ".join(variation['hashtags'])
@@ -50,7 +49,6 @@ def main():
             st.subheader("Generated Post:")
             st.write(post_data['content'])
             
-            # Display hashtags if included
             if include_hashtags and post_data['hashtags']:
                 st.write("**Suggested Hashtags:**")
                 hashtag_text = " ".join(post_data['hashtags'])
