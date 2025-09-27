@@ -1,6 +1,7 @@
 import streamlit as st
 from few_shot import FewShotPosts
 from post_generator import generate_post, generate_multiple_posts
+from linkedin_preview import LinkedInPreview
 
 length_options=["Short","Medium","Long"]
 language_options=["English","Hinglish"]
@@ -18,7 +19,7 @@ def main():
     with col3:
         selected_language = st.selectbox("Language",options=language_options)
 
-    col4, col5 = st.columns([1, 1])
+    col4, col5, col6 = st.columns([1, 1, 1])
     with col4:
         generate_variations = st.checkbox("Generate multiple variations", value=False)
         if generate_variations:
@@ -28,6 +29,9 @@ def main():
     with col5:
         include_hashtags = st.checkbox("Include hashtags", value=True)
     
+    with col6:
+        show_preview = st.checkbox("Show LinkedIn preview", value=True)
+    
     if st.button("Generate"):
         if generate_variations:
             # Generate multiple variations
@@ -35,6 +39,8 @@ def main():
                 variations = generate_multiple_posts(selected_length, selected_language, selected_tag, num_variations=num_variations, include_hashtags=include_hashtags)
             
             st.subheader("Generated Post Variations:")
+            
+            preview = LinkedInPreview()
             
             for i, variation in enumerate(variations):
                 with st.expander(f"Variation {variation['variation']}", expanded=(i==0)):
@@ -44,6 +50,13 @@ def main():
                         st.write("**Suggested Hashtags:**")
                         hashtag_text = " ".join(variation['hashtags'])
                         st.write(hashtag_text)
+                    
+                    if show_preview:
+                        st.write("**LinkedIn Preview:**")
+                        preview.render_linkedin_preview(
+                            variation['content'], 
+                            variation.get('hashtags', []) if include_hashtags else None
+                        )
         else:
             post_data = generate_post(selected_length, selected_language, selected_tag, include_hashtags=include_hashtags)
             st.subheader("Generated Post:")
@@ -53,5 +66,13 @@ def main():
                 st.write("**Suggested Hashtags:**")
                 hashtag_text = " ".join(post_data['hashtags'])
                 st.write(hashtag_text)
+            
+            if show_preview:
+                st.write("**LinkedIn Preview:**")
+                preview = LinkedInPreview()
+                preview.render_linkedin_preview(
+                    post_data['content'], 
+                    post_data.get('hashtags', []) if include_hashtags else None
+                )
 if __name__ == "__main__":
     main()
