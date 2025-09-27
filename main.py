@@ -8,6 +8,12 @@ language_options=["English","Hinglish"]
 
 def main():
     st.title("LinkedIn Post Generator")
+    
+    if 'generated_posts' not in st.session_state:
+        st.session_state.generated_posts = None
+    if 'show_variations' not in st.session_state:
+        st.session_state.show_variations = False
+    
     col1,col2,col3 = st.columns(3)
     fs = FewShotPosts()
     with col1:
@@ -34,13 +40,35 @@ def main():
     
     if st.button("Generate"):
         if generate_variations:
-            # Generate multiple variations
             with st.spinner("Generating multiple post variations..."):
                 variations = generate_multiple_posts(selected_length, selected_language, selected_tag, num_variations=num_variations, include_hashtags=include_hashtags)
             
+            st.session_state.generated_posts = {
+                'type': 'variations',
+                'data': variations,
+                'include_hashtags': include_hashtags,
+                'show_preview': show_preview
+            }
+            st.session_state.show_variations = True
+        else:
+            post_data = generate_post(selected_length, selected_language, selected_tag, include_hashtags=include_hashtags)
+            
+            st.session_state.generated_posts = {
+                'type': 'single',
+                'data': post_data,
+                'include_hashtags': include_hashtags,
+                'show_preview': show_preview
+            }
+            st.session_state.show_variations = False
+    
+    if st.session_state.generated_posts is not None:
+        if st.session_state.generated_posts['type'] == 'variations':
             st.subheader("Generated Post Variations:")
             
             preview = LinkedInPreview()
+            variations = st.session_state.generated_posts['data']
+            include_hashtags = st.session_state.generated_posts['include_hashtags']
+            show_preview = st.session_state.generated_posts['show_preview']
             
             for i, variation in enumerate(variations):
                 with st.expander(f"Variation {variation['variation']}", expanded=(i==0)):
@@ -52,14 +80,18 @@ def main():
                         st.write(hashtag_text)
                     
                     if show_preview:
-                        st.write("**LinkedIn Preview:**")
-                        preview.render_linkedin_preview(
-                            variation['content'], 
-                            variation.get('hashtags', []) if include_hashtags else None
-                        )
+                        if st.button(f"See LinkedIn Preview - Variation {variation['variation']}", key=f"preview_{i}"):
+                            st.write("**LinkedIn Preview:**")
+                            preview.render_linkedin_preview(
+                                variation['content'], 
+                                variation.get('hashtags', []) if include_hashtags else None
+                            )
         else:
-            post_data = generate_post(selected_length, selected_language, selected_tag, include_hashtags=include_hashtags)
             st.subheader("Generated Post:")
+            post_data = st.session_state.generated_posts['data']
+            include_hashtags = st.session_state.generated_posts['include_hashtags']
+            show_preview = st.session_state.generated_posts['show_preview']
+            
             st.write(post_data['content'])
             
             if include_hashtags and post_data['hashtags']:
@@ -68,11 +100,12 @@ def main():
                 st.write(hashtag_text)
             
             if show_preview:
-                st.write("**LinkedIn Preview:**")
-                preview = LinkedInPreview()
-                preview.render_linkedin_preview(
-                    post_data['content'], 
-                    post_data.get('hashtags', []) if include_hashtags else None
-                )
+                if st.button("See LinkedIn Preview", key="preview_single"):
+                    st.write("**LinkedIn Preview:**")
+                    preview = LinkedInPreview()
+                    preview.render_linkedin_preview(
+                        post_data['content'], 
+                        post_data.get('hashtags', []) if include_hashtags else None
+                    )
 if __name__ == "__main__":
     main()

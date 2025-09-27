@@ -131,20 +131,14 @@ class LinkedInPreview:
                     display: inline-block;
                     width: 16px;
                     height: 16px;
-                    background: #0077b5;
-                    border-radius: 50%;
                     margin-left: 4px;
                     position: relative;
+                    vertical-align: middle;
+                    margin-top: -1px;
                 }}
-                .linkedin-user-info .verified::after {{
-                    content: "✓";
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: white;
-                    font-size: 10px;
-                    font-weight: bold;
+                .linkedin-user-info .verified svg {{
+                    width: 16px;
+                    height: 16px;
                 }}
                 .linkedin-user-info p {{
                     margin: 0;
@@ -238,7 +232,7 @@ class LinkedInPreview:
                         <div class="linkedin-avatar-fallback" style="display: none;">{user['name'][0]}</div>
                     </div>
                     <div class="linkedin-user-info">
-                        <h3>{user['name']}<span class="verified"></span><span class="connection">• 2nd</span></h3>
+                        <h3>{user['name']}<span class="verified"><svg viewBox="0 0 24 24" fill="white" stroke="black" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4" fill="black"/></svg></span><span class="connection">• 2nd</span></h3>
                         <p>{user['title']}</p>
                         <div class="linkedin-time">{user['time']} • <span class="globe">🌐</span></div>
                     </div>
